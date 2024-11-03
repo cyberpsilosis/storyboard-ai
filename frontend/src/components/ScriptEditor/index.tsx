@@ -15,35 +15,35 @@ export const ScriptEditor: React.FC = () => {
   const [prompt, setPrompt] = useState('')
   const { toast } = useToast()
 
-  const handleEditorChange = (value: string | undefined) => {
-    if (value !== undefined) {
-      dispatch(updatePlot(value))
-    }
-  }
-
   const generateCharacters = async (prompt: string) => {
-    const characterPrompt = `Based on this story prompt: "${prompt}"
-    Create two main characters that would make this story interesting.
-    For each character, provide:
-    - A brief but vivid description
-    - Their role in the story
-    - Key personality traits
-    
-    Format as JSON with character1 and character2 fields.
-    Example format:
+    const characterPrompt = `Generate two characters for this story prompt: "${prompt}"
+    Return ONLY a JSON object with this exact format, no additional text:
     {
-      "character1": "A retired detective with a photographic memory...",
-      "character2": "A tech-savvy street artist with a mysterious past..."
+      "character1": "description here...",
+      "character2": "description here..."
     }`;
 
-    const charactersResponse = await generateScript(characterPrompt);
     try {
-      const characters = JSON.parse(charactersResponse);
-      dispatch(updateCh1(characters.character1));
-      dispatch(updateCh2(characters.character2));
-      return characters;
+      const charactersResponse = await generateScript(characterPrompt);
+      
+      // Try to extract JSON if it's wrapped in text
+      const jsonMatch = charactersResponse.match(/\{[\s\S]*\}/);
+      const jsonStr = jsonMatch ? jsonMatch[0] : charactersResponse;
+      
+      try {
+        const characters = JSON.parse(jsonStr);
+        if (!characters.character1 || !characters.character2) {
+          throw new Error('Invalid character format');
+        }
+        dispatch(updateCh1(characters.character1));
+        dispatch(updateCh2(characters.character2));
+        return characters;
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        throw new Error('Failed to parse character data');
+      }
     } catch (error) {
-      console.error('Failed to parse characters:', error);
+      console.error('Character generation error:', error);
       throw new Error('Failed to generate characters');
     }
   }
@@ -75,7 +75,7 @@ export const ScriptEditor: React.FC = () => {
         description: "Creating your script with the generated characters..."
       })
 
-      const scriptPrompt = `Create a script for a story with the following elements:
+      const scriptPrompt = `Create a script for this story:
         
         Story Prompt: ${prompt}
 
@@ -83,13 +83,8 @@ export const ScriptEditor: React.FC = () => {
         Character 1: ${characters.character1}
         Character 2: ${characters.character2}
         
-        The script should include:
-        - A compelling narrative arc based on the prompt
-        - Natural dialogue between the characters
-        - Clear scene descriptions
-        - Emotional depth and character development
-        
-        Format the output as a proper screenplay.`;
+        Format as a proper screenplay with scene descriptions and dialogue.
+        Include character development and emotional depth.`;
 
       const script = await generateScript(scriptPrompt)
       dispatch(updatePlot(script))
@@ -99,7 +94,7 @@ export const ScriptEditor: React.FC = () => {
         description: "Your script and characters have been generated successfully."
       })
     } catch (error) {
-      console.error('Generation error:', error)
+      console.error('Generation error:', error);
       toast({
         title: "Generation Failed",
         description: error instanceof Error ? error.message : "Failed to generate content",
