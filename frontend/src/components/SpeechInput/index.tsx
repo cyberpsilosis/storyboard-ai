@@ -45,9 +45,15 @@ export const SpeechInput: React.FC<SpeechInputProps> = ({ onTranscript }) => {
       variant="outline"
       size="icon"
       onClick={startListening}
-      className={isListening ? 'animate-pulse bg-red-100' : ''}
+      className={`transition-all duration-200 ${
+        isListening 
+          ? 'bg-red-100 dark:bg-red-900 animate-pulse ring-2 ring-red-500' 
+          : ''
+      }`}
     >
-      <Icons.mic className="h-4 w-4" />
+      <Icons.mic className={`h-4 w-4 ${
+        isListening ? 'text-red-500' : ''
+      }`} />
     </Button>
   );
 }; 

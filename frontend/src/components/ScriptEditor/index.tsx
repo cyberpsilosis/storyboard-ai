@@ -21,13 +21,11 @@ export const ScriptEditor: React.FC = () => {
 
   const handleSpeechInput = (transcript: string) => {
     setPrompt(transcript);
+    toast({
+      title: "Voice Input Received",
+      description: transcript,
+    });
   };
-
-  const handleEditorChange = (value: string | undefined) => {
-    if (value !== undefined) {
-      dispatch(updatePlot(value))
-    }
-  }
 
   const generateCharacters = async (prompt: string) => {
     const characterPrompt = `Generate two characters for this story prompt: "${prompt}"
@@ -119,6 +117,12 @@ export const ScriptEditor: React.FC = () => {
     }
   }
 
+  const handleEditorChange = (value: string | undefined) => {
+    if (value !== undefined) {
+      dispatch(updatePlot(value))
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4 w-full h-full">
       <div className="flex gap-4 items-center">
@@ -187,7 +191,16 @@ export const ScriptEditor: React.FC = () => {
           }}
         />
       </div>
-      <div className="flex justify-end">
+
+      <div className="flex justify-between">
+        <Button
+          onClick={() => handleGenerateStoryboard()}
+          disabled={!plotContent || isGenerating}
+          className="bg-green-600 hover:bg-green-700"
+        >
+          <Icons.image className="mr-2 h-4 w-4" />
+          Generate Storyboard
+        </Button>
         <Button 
           variant="outline" 
           onClick={() => {
