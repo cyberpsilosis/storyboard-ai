@@ -4,9 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/lib/supabase'
 
-// Add a logging function
 const logError = (message: string, error: any) => {
-  // This will show in Vercel logs
   console.error(JSON.stringify({
     timestamp: new Date().toISOString(),
     message,
@@ -28,27 +26,18 @@ export function LoginForm() {
   useEffect(() => {
     const testConnection = async () => {
       try {
-        // Test basic connection
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
         if (sessionError) {
           setConnectionStatus('Connection Error')
           logError('Session check failed', sessionError)
           return
         }
 
-        // Test if we can access Supabase
-        const { error: pingError } = await supabase.from('_test').select('*').limit(1)
-        if (pingError && pingError.message !== 'Invalid table') {
-          setConnectionStatus('Database Error')
-          logError('Database check failed', pingError)
-          return
-        }
-
-        setConnectionStatus(session ? 'Connected with session' : 'Connected, no session')
-        console.log('Connection test successful', {
-          hasSession: !!session,
-          timestamp: new Date().toISOString()
-        })
+        // Log the full session data for debugging
+        console.log('Session data:', JSON.stringify(session, null, 2))
+        
+        setConnectionStatus(session ? 'Connected with session' : 'Connected, ready')
       } catch (err) {
         setConnectionStatus('Connection Failed')
         logError('Connection test error', err)
@@ -57,28 +46,25 @@ export function LoginForm() {
     testConnection()
   }, [])
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCursor(c => !c)
-    }, 500)
-    return () => clearInterval(interval)
-  }, [])
-
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
-    try {
-      const cleanEmail = email.toLowerCase().trim()
-      console.log('Login attempt:', { 
-        email: cleanEmail,
-        timestamp: new Date().toISOString()
-      })
+    const cleanEmail = email.toLowerCase().trim()
+    const cleanPassword = password.trim()
 
+    // Log the attempt (but not the password)
+    console.log('Attempting login:', {
+      email: cleanEmail,
+      hasPassword: !!cleanPassword,
+      timestamp: new Date().toISOString()
+    })
+
+    try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
-        password: password.trim()
+        password: cleanPassword
       })
 
       if (error) {
@@ -87,10 +73,12 @@ export function LoginForm() {
       }
 
       if (data?.user) {
-        console.log('Login successful', {
+        console.log('Login successful:', {
           userId: data.user.id,
+          email: data.user.email,
           timestamp: new Date().toISOString()
         })
+        setConnectionStatus('Authenticated')
       }
     } catch (err) {
       logError('Login error', err)
