@@ -13,6 +13,56 @@ import { generateImage } from '@/lib/together'
 import { Storyboard } from '@/components/Storyboard'
 import { storyboardService } from '@/lib/storyboard-service'
 
+const createCinematicScriptPrompt = (prompt: string, characters: any) => {
+  return `As a professional screenwriter and filmmaker, create a cinematic script that follows industry standards and visual storytelling principles.
+
+Story Prompt: ${prompt}
+
+Characters:
+Character 1: ${characters.character1}
+Character 2: ${characters.character2}
+
+Requirements:
+- Follow professional screenplay format
+- Focus on visual storytelling and camera directions
+- Include specific shot types (wide, medium, close-up)
+- Add atmospheric details and lighting cues
+- Include camera movements when relevant
+- Specify time of day and weather conditions
+- Note important sound design elements
+- Keep dialogue minimal and impactful
+
+Format each scene with:
+SCENE HEADING - Time and location
+DESCRIPTION - Rich visual details and camera directions
+DIALOGUE - Only when essential to the story
+TRANSITIONS - When dramatically appropriate
+
+Example format:
+EXT. FOREST - DAWN
+A low-angle tracking shot follows footprints in the morning dew. Camera RISES to reveal...`;
+
+};
+
+const createStoryboardScenePrompt = (script: string) => {
+  return `As a professional storyboard artist and cinematographer, analyze this script and create 5 key scene descriptions for visualization.
+  Focus on creating visually striking, cinematic moments that could be shot by elite cinematographers like Roger Deakins or Emmanuel Lubezki.
+
+  For each scene, provide:
+  - Camera angle and movement
+  - Lighting setup and atmosphere
+  - Character positioning and blocking
+  - Environmental details
+  - Time of day and weather conditions
+  - Color palette and mood
+  - Depth of field and focus points
+
+  Format each scene as a detailed visual description, separated by ||| delimiters.
+  
+  Script:
+  ${script}`;
+};
+
 export const ScriptEditor: React.FC = () => {
   const dispatch = useAppDispatch()
   const plotContent = useAppSelector(selectPlot)
@@ -81,18 +131,17 @@ export const ScriptEditor: React.FC = () => {
         title: "Missing Prompt",
         description: "Please enter a story prompt before generating.",
         variant: "destructive"
-      })
-      return
+      });
+      return;
     }
 
-    setIsGenerating(true)
-    
+    setIsGenerating(true);
     try {
       // First generate title
       toast({
         title: "Generating Title",
         description: "Creating title from prompt..."
-      })
+      });
 
       const generatedTitle = await generateTitle(prompt);
       setTitle(generatedTitle);
@@ -101,45 +150,35 @@ export const ScriptEditor: React.FC = () => {
       toast({
         title: "Generating Characters",
         description: "Creating characters for your story..."
-      })
+      });
 
       const characters = await generateCharacters(prompt);
 
-      // Then generate script
+      // Then generate script with cinematic focus
       toast({
         title: "Generating Script",
-        description: "Creating your script with the generated characters..."
-      })
+        description: "Creating your cinematic script..."
+      });
 
-      const scriptPrompt = `Create a script for this story:
-        
-        Story Prompt: ${prompt}
+      const scriptPrompt = createCinematicScriptPrompt(prompt, characters);
+      const script = await generateScript(scriptPrompt);
+      dispatch(updatePlot(script));
 
-        Characters:
-        Character 1: ${characters.character1}
-        Character 2: ${characters.character2}
-        
-        Format as a proper screenplay with scene descriptions and dialogue.
-        Include character development and emotional depth.`;
-
-      const script = await generateScript(scriptPrompt)
-      dispatch(updatePlot(script))
-      
       toast({
         title: "Generation Complete",
-        description: "Your script and characters have been generated successfully."
-      })
+        description: "Your cinematic script has been generated successfully."
+      });
     } catch (error) {
       console.error('Generation error:', error);
       toast({
         title: "Generation Failed",
         description: error instanceof Error ? error.message : "Failed to generate content",
         variant: "destructive"
-      })
+      });
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
+  };
 
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
@@ -159,13 +198,14 @@ export const ScriptEditor: React.FC = () => {
 
     setIsGenerating(true);
     try {
-      const scenes = await generateStoryboardScenes(plotContent);
+      const scenePrompt = createStoryboardScenePrompt(plotContent);
+      const scenes = await generateStoryboardScenes(scenePrompt);
       const images: string[] = [];
 
       for (let i = 0; i < scenes.length; i++) {
         toast({
           title: `Generating Scene ${i + 1}`,
-          description: "Creating image..."
+          description: "Creating cinematic shot..."
         });
 
         const imageUrl = await generateImage(scenes[i]);
@@ -176,9 +216,8 @@ export const ScriptEditor: React.FC = () => {
       
       toast({
         title: "Storyboard Complete",
-        description: `Generated ${images.length} scenes.`
+        description: `Generated ${images.length} cinematic scenes.`
       });
-
     } catch (error) {
       console.error('Storyboard generation error:', error);
       toast({
