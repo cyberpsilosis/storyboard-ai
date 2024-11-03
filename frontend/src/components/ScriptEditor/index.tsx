@@ -54,8 +54,11 @@ export const ScriptEditor: React.FC = () => {
         if (!characters.character1 || !characters.character2) {
           throw new Error('Invalid character format');
         }
-        dispatch(updateCh1(characters.character1));
-        dispatch(updateCh2(characters.character2));
+        
+        // Update character states with the string descriptions
+        dispatch(updateCh1(characters.character1.toString()));
+        dispatch(updateCh2(characters.character2.toString()));
+        
         return characters;
       } catch (parseError) {
         console.error('JSON parse error:', parseError);
@@ -264,7 +267,7 @@ export const ScriptEditor: React.FC = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">Character 1</label>
           <Textarea
