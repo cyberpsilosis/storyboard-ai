@@ -2,19 +2,16 @@ import { useState } from 'react'
 import Editor from '@monaco-editor/react'
 import { Button } from "@/components/ui/button"
 import { useAppDispatch, useAppSelector } from '@/hooks/redux-hooks'
-import { updatePlot, updateCh1, updateCh2, selectPlot, selectCh1, selectCh2 } from '@/features/input/inputSlice'
+import { updatePlot, updateCh1, updateCh2, selectPlot } from '@/features/input/inputSlice'
 import { useToast } from '@/hooks/use-toast'
 import { Icons } from '@/components/icons'
 import { generateScript } from '@/lib/perplexity'
 import { Input } from "@/components/ui/input"
 import { SpeechInput } from '@/components/SpeechInput'
-import { Textarea } from "@/components/ui/textarea"
 
 export const ScriptEditor: React.FC = () => {
   const dispatch = useAppDispatch()
   const plotContent = useAppSelector(selectPlot)
-  const ch1Content = useAppSelector(selectCh1)
-  const ch2Content = useAppSelector(selectCh2)
   const [isGenerating, setIsGenerating] = useState(false)
   const [prompt, setPrompt] = useState('')
   const { toast } = useToast()
@@ -154,27 +151,6 @@ export const ScriptEditor: React.FC = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Character 1</label>
-          <Textarea
-            value={ch1Content || ''}
-            readOnly
-            className="h-[100px] font-mono text-sm"
-            placeholder="Character 1 will appear here after generation..."
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Character 2</label>
-          <Textarea
-            value={ch2Content || ''}
-            readOnly
-            className="h-[100px] font-mono text-sm"
-            placeholder="Character 2 will appear here after generation..."
-          />
-        </div>
-      </div>
-
       <div className="h-[600px] border rounded-lg overflow-hidden">
         <Editor
           height="100%"
@@ -194,7 +170,12 @@ export const ScriptEditor: React.FC = () => {
 
       <div className="flex justify-between">
         <Button
-          onClick={() => handleGenerateStoryboard()}
+          onClick={() => {
+            toast({
+              title: "Generating Storyboard",
+              description: "Creating visual scenes from your script..."
+            });
+          }}
           disabled={!plotContent || isGenerating}
           className="bg-green-600 hover:bg-green-700"
         >
