@@ -63,15 +63,6 @@ export function LoginForm() {
     const cleanPassword = password.trim()
 
     try {
-      // First, check if user exists
-      const { data: userCheck } = await supabase
-        .from('auth.users')
-        .select('id, email')
-        .eq('email', cleanEmail)
-        .single()
-
-      console.log('User check:', userCheck)
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
         password: cleanPassword
