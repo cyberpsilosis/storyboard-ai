@@ -1,26 +1,18 @@
-import React from 'react'
+import { useState } from 'react'
 import Editor from '@monaco-editor/react'
 import { Button } from "@/components/ui/button"
 import { useAppDispatch, useAppSelector } from '@/hooks/redux-hooks'
 import { updatePlot, selectPlot, selectCh1, selectCh2 } from '@/features/input/inputSlice'
-import { setLoading, setError } from '@/features/shots/shotsSlice'
-import { initialize, StoryboardStateInferface } from '@/features/storyboard/storyboardSlice'
 import { useToast } from '@/hooks/use-toast'
 import { Icons } from '@/components/icons'
-import { api } from '@/lib/api'
+import { generateScript } from '@/lib/perplexity'
 
-interface ScriptEditorProps {
-  initialContent?: string
-}
-
-export const ScriptEditor: React.FC<ScriptEditorProps> = ({
-  initialContent = '',
-}) => {
+export const ScriptEditor: React.FC = () => {
   const dispatch = useAppDispatch()
   const plotContent = useAppSelector(selectPlot)
   const ch1 = useAppSelector(selectCh1)
   const ch2 = useAppSelector(selectCh2)
-  const [isGenerating, setIsGenerating] = React.useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
   const { toast } = useToast()
 
   const handleEditorChange = (value: string | undefined) => {
@@ -29,43 +21,46 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
     }
   }
 
-  const handleReset = () => {
-    dispatch(updatePlot(''))
-    toast({
-      title: "Script Reset",
-      description: "Your script has been cleared.",
-    })
-  }
-
-  const handleGenerateStoryboard = async () => {
-    if (!plotContent) return
-    
-    setIsGenerating(true)
-    dispatch(setLoading(true))
-    
-    try {
-      const data: StoryboardStateInferface = await api.generateStoryboard({
-        plot: plotContent,
-        ch1,
-        ch2
-      })
-
-      dispatch(initialize(data))
+  const handleGenerateScript = async () => {
+    if (!ch1 || !ch2) {
       toast({
-        title: "Storyboard Generated",
-        description: "Successfully generated your storyboard.",
+        title: "Missing Characters",
+        description: "Please define both characters before generating a script.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setIsGenerating(true)
+    try {
+      const prompt = `Create a script for a story with two main characters:
+        Character 1: ${ch1}
+        Character 2: ${ch2}
+        
+        The script should include:
+        - A compelling narrative arc
+        - Natural dialogue between the characters
+        - Clear scene descriptions
+        - Emotional depth and character development
+        
+        Format the output as a proper screenplay.`;
+
+      const script = await generateScript(prompt)
+      dispatch(updatePlot(script))
+      
+      toast({
+        title: "Script Generated",
+        description: "Your script has been generated successfully."
       })
     } catch (error) {
-      console.error('Error generating storyboard:', error)
-      dispatch(setError(error instanceof Error ? error.message : 'Failed to generate storyboard'))
+      console.error('Script generation error:', error)
       toast({
-        variant: "destructive",
         title: "Generation Failed",
-        description: error instanceof Error ? error.message : 'Failed to generate storyboard',
+        description: "Failed to generate script. Please try again.",
+        variant: "destructive"
       })
     } finally {
       setIsGenerating(false)
-      dispatch(setLoading(false))
     }
   }
 
@@ -75,7 +70,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
         <Editor
           height="100%"
           defaultLanguage="markdown"
-          value={plotContent || initialContent}
+          value={plotContent || ''}
           onChange={handleEditorChange}
           theme="vs-dark"
           options={{
@@ -90,24 +85,24 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = ({
       <div className="flex justify-end gap-2">
         <Button 
           variant="outline" 
-          onClick={handleReset}
+          onClick={() => dispatch(updatePlot(''))}
           disabled={isGenerating || !plotContent}
         >
           Reset
         </Button>
         <Button
-          onClick={handleGenerateStoryboard}
-          disabled={isGenerating || !plotContent}
+          onClick={handleGenerateScript}
+          disabled={isGenerating || !ch1 || !ch2}
         >
           {isGenerating ? (
             <>
               <Icons.loading className="mr-2 h-4 w-4 animate-spin" />
-              Generating...
+              Generating Script...
             </>
           ) : (
             <>
               <Icons.submit className="mr-2 h-4 w-4" />
-              Generate Storyboard
+              Generate Script
             </>
           )}
         </Button>
