@@ -22,6 +22,7 @@ import {
   Trash,
   User,
   X,
+  Mic,
 } from "lucide-react"
 
 export type IconProps = LucideProps
@@ -64,4 +65,5 @@ export const Icons = {
       ></path>
     </svg>
   ),
+  mic: Mic,
 }
