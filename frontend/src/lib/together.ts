@@ -1,7 +1,11 @@
 const TOGETHER_API_KEY = import.meta.env.EXT_PUBLIC_TOGETHER_API_KEY;
 
 interface GenerationResponse {
-  images: string[];
+  output: {
+    choices: [{
+      image: string;
+    }];
+  };
 }
 
 export const generateImage = async (prompt: string): Promise<string> => {
@@ -12,20 +16,23 @@ export const generateImage = async (prompt: string): Promise<string> => {
   try {
     console.log('Generating image with prompt:', prompt);
 
-    const response = await fetch('https://api.together.xyz/inference', {
+    const response = await fetch('https://api.together.xyz/v1/image/create', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${TOGETHER_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'stabilityai/stable-diffusion-xl-base-1.0',
-        prompt: prompt,
-        negative_prompt: "text, watermark, logo, blurry, distorted, low quality",
-        num_inference_steps: 30,
+        model: 'black-forest-labs/FLUX.1-schnell',
+        prompt,
+        negative_prompt: "text, watermark, logo, blurry, distorted, low quality, bad anatomy, bad proportions",
+        n: 1,
+        steps: 25,
         width: 1024,
         height: 768,
-        guidance_scale: 7.5,
+        seed: Math.floor(Math.random() * 1000000),
+        guidance_scale: 7.0,
+        scheduler: "dpm++_2m_karras"
       })
     });
 
@@ -38,11 +45,11 @@ export const generateImage = async (prompt: string): Promise<string> => {
     const data: GenerationResponse = await response.json();
     console.log('Together API response:', data);
 
-    if (!data.images?.[0]) {
+    if (!data.output?.choices?.[0]?.image) {
       throw new Error('No image generated');
     }
 
-    return data.images[0];
+    return data.output.choices[0].image;
   } catch (error) {
     console.error('Image generation error:', error);
     throw error;
