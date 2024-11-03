@@ -1,4 +1,18 @@
-import { Mic, Loader2, Image, Download, ChevronLeft, ChevronRight, X, Save, Edit, Trash2 } from 'lucide-react'
+import { 
+  Mic, 
+  Loader2, 
+  Image, 
+  Download, 
+  ChevronLeft, 
+  ChevronRight, 
+  X, 
+  Save,
+  Edit,
+  Trash2,
+  Plus,
+  AlertTriangle,
+  Film
+} from 'lucide-react'
 
 export const Icons = {
   mic: Mic,
@@ -11,5 +25,8 @@ export const Icons = {
   close: X,
   save: Save,
   edit: Edit,
-  trash: Trash2
+  trash: Trash2,
+  add: Plus,
+  warning: AlertTriangle,
+  media: Film
 }

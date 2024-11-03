@@ -25,7 +25,7 @@ export const generateImage = async (prompt: string): Promise<string> => {
         model: "black-forest-labs/FLUX.1-schnell",
         prompt,
         n: 1,
-        steps: 25,
+        steps: 12,
         width: 1024,
         height: 768
       })
