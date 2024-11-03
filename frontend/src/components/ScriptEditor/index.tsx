@@ -6,6 +6,7 @@ import { updatePlot, selectPlot, selectCh1, selectCh2 } from '@/features/input/i
 import { useToast } from '@/hooks/use-toast'
 import { Icons } from '@/components/icons'
 import { generateScript } from '@/lib/perplexity'
+import { Input } from "@/components/ui/input"
 
 export const ScriptEditor: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -13,6 +14,7 @@ export const ScriptEditor: React.FC = () => {
   const ch1 = useAppSelector(selectCh1)
   const ch2 = useAppSelector(selectCh2)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [prompt, setPrompt] = useState('')
   const { toast } = useToast()
 
   const handleEditorChange = (value: string | undefined) => {
@@ -31,21 +33,34 @@ export const ScriptEditor: React.FC = () => {
       return
     }
 
+    if (!prompt.trim()) {
+      toast({
+        title: "Missing Prompt",
+        description: "Please enter a story prompt before generating.",
+        variant: "destructive"
+      })
+      return
+    }
+
     setIsGenerating(true)
     try {
-      const prompt = `Create a script for a story with two main characters:
+      const fullPrompt = `Create a script for a story with the following elements:
+        
+        Story Prompt: ${prompt}
+
+        Characters:
         Character 1: ${ch1}
         Character 2: ${ch2}
         
         The script should include:
-        - A compelling narrative arc
+        - A compelling narrative arc based on the prompt
         - Natural dialogue between the characters
         - Clear scene descriptions
         - Emotional depth and character development
         
         Format the output as a proper screenplay.`;
 
-      const script = await generateScript(prompt)
+      const script = await generateScript(fullPrompt)
       dispatch(updatePlot(script))
       
       toast({
@@ -66,6 +81,31 @@ export const ScriptEditor: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4 w-full h-full">
+      <div className="flex gap-4 items-center">
+        <Input
+          placeholder="Enter your story prompt here..."
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          className="flex-grow font-mono"
+          disabled={isGenerating}
+        />
+        <Button
+          onClick={handleGenerateScript}
+          disabled={isGenerating || !ch1 || !ch2 || !prompt.trim()}
+        >
+          {isGenerating ? (
+            <>
+              <Icons.loading className="mr-2 h-4 w-4 animate-spin" />
+              Generating Script...
+            </>
+          ) : (
+            <>
+              <Icons.submit className="mr-2 h-4 w-4" />
+              Generate Script
+            </>
+          )}
+        </Button>
+      </div>
       <div className="h-[600px] border rounded-lg overflow-hidden">
         <Editor
           height="100%"
@@ -82,29 +122,13 @@ export const ScriptEditor: React.FC = () => {
           }}
         />
       </div>
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end">
         <Button 
           variant="outline" 
           onClick={() => dispatch(updatePlot(''))}
           disabled={isGenerating || !plotContent}
         >
           Reset
-        </Button>
-        <Button
-          onClick={handleGenerateScript}
-          disabled={isGenerating || !ch1 || !ch2}
-        >
-          {isGenerating ? (
-            <>
-              <Icons.loading className="mr-2 h-4 w-4 animate-spin" />
-              Generating Script...
-            </>
-          ) : (
-            <>
-              <Icons.submit className="mr-2 h-4 w-4" />
-              Generate Script
-            </>
-          )}
         </Button>
       </div>
     </div>
