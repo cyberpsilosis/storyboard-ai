@@ -1,8 +1,9 @@
 const TOGETHER_API_KEY = import.meta.env.VITE_TOGETHER_API_KEY;
 
 interface GenerationResponse {
-  data: Array<{
-    b64_json: string;
+  status: string;
+  output: Array<{
+    image: string;
   }>;
 }
 
@@ -40,11 +41,13 @@ export const generateImage = async (prompt: string): Promise<string> => {
     const data: GenerationResponse = await response.json();
     console.log('Together API response:', data);
 
-    if (!data.data?.[0]?.b64_json) {
+    if (!data.output?.[0]?.image) {
+      console.error('Invalid response format:', data);
       throw new Error('No image generated');
     }
 
-    return `data:image/png;base64,${data.data[0].b64_json}`;
+    // The image is already a base64 string
+    return data.output[0].image;
   } catch (error) {
     console.error('Image generation error:', error);
     throw error;
