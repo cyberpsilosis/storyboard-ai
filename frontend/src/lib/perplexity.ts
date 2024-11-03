@@ -29,7 +29,7 @@ export const generateScript = async (prompt: string): Promise<string> => {
         'Authorization': `Bearer ${PERPLEXITY_API_KEY}`
       },
       body: JSON.stringify({
-        model: "pplx-7b-online",
+        model: "mistral-7b-instruct",
         messages: [
           {
             role: "system",
