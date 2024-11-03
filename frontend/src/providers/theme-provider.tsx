@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 
 type Theme = "dark" | "light" | "system"
@@ -17,19 +16,30 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
+interface ThemeProviderProps {
+  children: React.ReactNode
+  defaultTheme?: Theme
+}
+
 export function ThemeProvider({
   children,
   defaultTheme = "dark",
-  ...props
-}: {
-  children: React.ReactNode
-  defaultTheme?: Theme
-}) {
+}: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(defaultTheme)
 
   useEffect(() => {
     const root = window.document.documentElement
     root.classList.remove("light", "dark")
+
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light"
+      root.classList.add(systemTheme)
+      return
+    }
+
     root.classList.add(theme)
   }, [theme])
 
@@ -37,19 +47,16 @@ export function ThemeProvider({
     theme,
     setTheme: (theme: Theme) => {
       setTheme(theme)
-      localStorage.setItem("theme", theme)
+      try {
+        localStorage.setItem("theme", theme)
+      } catch (e) {
+        console.error("Failed to save theme preference:", e)
+      }
     },
   }
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme
-    if (savedTheme) {
-      setTheme(savedTheme)
-    }
-  }, [])
-
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
+    <ThemeProviderContext.Provider value={value}>
       {children}
     </ThemeProviderContext.Provider>
   )
@@ -57,7 +64,9 @@ export function ThemeProvider({
 
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext)
+
   if (context === undefined)
     throw new Error("useTheme must be used within a ThemeProvider")
+
   return context
 } 
