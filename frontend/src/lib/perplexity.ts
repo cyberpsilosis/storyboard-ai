@@ -118,4 +118,43 @@ export const generateStoryboardScenes = async (script: string): Promise<string[]
     console.error('Scene generation error:', error);
     throw error;
   }
-} 
+}
+
+export const generateTitle = async (prompt: string): Promise<string> => {
+  try {
+    const titlePrompt = `Create a short, creative title for this story prompt. Return ONLY the title, no quotes or extra text:
+    "${prompt}"`;
+
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-sonar-huge-128k-online",
+        messages: [
+          {
+            role: "system",
+            content: "You are a creative title generator. Create short, engaging titles."
+          },
+          {
+            role: "user",
+            content: titlePrompt
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content.trim();
+  } catch (error) {
+    console.error('Title generation error:', error);
+    throw error;
+  }
+}; 

@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/redux-hooks'
 import { updatePlot, updateCh1, updateCh2, selectPlot, selectCh1, selectCh2 } from '@/features/input/inputSlice'
 import { useToast } from '@/hooks/use-toast'
 import { Icons } from '@/components/icons'
-import { generateScript, generateStoryboardScenes } from '@/lib/perplexity'
+import { generateScript, generateStoryboardScenes, generateTitle } from '@/lib/perplexity'
 import { Input } from "@/components/ui/input"
 import { SpeechInput } from '@/components/SpeechInput'
 import { Textarea } from "@/components/ui/textarea"
@@ -80,7 +80,16 @@ export const ScriptEditor: React.FC = () => {
     setIsGenerating(true)
     
     try {
-      // First generate characters
+      // First generate title
+      toast({
+        title: "Generating Title",
+        description: "Creating title from prompt..."
+      })
+
+      const generatedTitle = await generateTitle(prompt);
+      setTitle(generatedTitle);
+
+      // Then generate characters
       toast({
         title: "Generating Characters",
         description: "Creating characters for your story..."
@@ -88,7 +97,7 @@ export const ScriptEditor: React.FC = () => {
 
       const characters = await generateCharacters(prompt);
 
-      // Then generate the script
+      // Then generate script
       toast({
         title: "Generating Script",
         description: "Creating your script with the generated characters..."
