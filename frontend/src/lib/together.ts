@@ -1,4 +1,4 @@
-const TOGETHER_API_KEY = import.meta.env.EXT_PUBLIC_TOGETHER_API_KEY;
+const TOGETHER_API_KEY = import.meta.env.VITE_TOGETHER_API_KEY;
 
 interface GenerationResponse {
   data: Array<{
@@ -8,6 +8,7 @@ interface GenerationResponse {
 
 export const generateImage = async (prompt: string): Promise<string> => {
   if (!TOGETHER_API_KEY) {
+    console.error('Together API key missing:', import.meta.env);
     throw new Error('Together API key not configured');
   }
 
