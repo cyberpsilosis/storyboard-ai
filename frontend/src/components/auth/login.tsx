@@ -62,21 +62,27 @@ export function LoginForm() {
     const cleanEmail = email.toLowerCase().trim()
     const cleanPassword = password.trim()
 
-    // Log the attempt (but not the password)
-    console.log('Attempting login:', {
-      email: cleanEmail,
-      hasPassword: !!cleanPassword,
-      timestamp: new Date().toISOString()
-    })
-
     try {
+      // First, check if user exists
+      const { data: userCheck } = await supabase
+        .from('auth.users')
+        .select('id, email')
+        .eq('email', cleanEmail)
+        .single()
+
+      console.log('User check:', userCheck)
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
         password: cleanPassword
       })
 
       if (error) {
-        logError('Login failed', error)
+        console.error('Auth error details:', {
+          error,
+          email: cleanEmail,
+          timestamp: new Date().toISOString()
+        })
         throw error
       }
 
@@ -89,7 +95,7 @@ export function LoginForm() {
         setConnectionStatus('Authenticated')
       }
     } catch (err) {
-      logError('Login error', err)
+      console.error('Full error details:', err)
       if (err instanceof AuthError) {
         setError('ACCESS DENIED: Invalid credentials')
       } else {
