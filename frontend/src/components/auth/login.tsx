@@ -4,12 +4,41 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/lib/supabase'
 
+// Add a logging function
+const logError = (message: string, error: any) => {
+  // This will show in Vercel logs
+  console.error(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    message,
+    error: error?.message || error,
+    stack: error?.stack,
+    supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+  }, null, 2))
+}
+
 export function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [cursor, setCursor] = useState(true)
+
+  // Test Supabase connection on mount
+  useEffect(() => {
+    const testConnection = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession()
+        if (error) {
+          logError('Supabase connection test failed', error)
+        } else {
+          console.log('Supabase connection test successful', { hasSession: !!data.session })
+        }
+      } catch (err) {
+        logError('Supabase connection test error', err)
+      }
+    }
+    testConnection()
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -24,29 +53,30 @@ export function LoginForm() {
     setError(null)
 
     try {
+      const cleanEmail = email.toLowerCase().trim()
       console.log('Login attempt:', { 
-        email,
-        supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+        email: cleanEmail,
         timestamp: new Date().toISOString()
       })
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.toLowerCase().trim(),
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
         password: password.trim()
       })
 
       if (error) {
-        console.error('Login error details:', {
-          message: error.message,
-          status: error.status,
-          name: error.name
-        })
+        logError('Login failed', error)
         throw error
       }
 
-      console.log('Login successful')
+      if (data?.user) {
+        console.log('Login successful', {
+          userId: data.user.id,
+          timestamp: new Date().toISOString()
+        })
+      }
     } catch (err) {
-      console.error('Login error:', err)
+      logError('Login error', err)
       if (err instanceof AuthError) {
         setError('ACCESS DENIED: Invalid credentials')
       } else {
