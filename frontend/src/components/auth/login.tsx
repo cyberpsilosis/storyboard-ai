@@ -22,19 +22,36 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [cursor, setCursor] = useState(true)
+  const [connectionStatus, setConnectionStatus] = useState<string>('Checking connection...')
 
-  // Test Supabase connection on mount
+  // Test Supabase connection and user status
   useEffect(() => {
     const testConnection = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession()
-        if (error) {
-          logError('Supabase connection test failed', error)
-        } else {
-          console.log('Supabase connection test successful', { hasSession: !!data.session })
+        // Test basic connection
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        if (sessionError) {
+          setConnectionStatus('Connection Error')
+          logError('Session check failed', sessionError)
+          return
         }
+
+        // Test if we can access Supabase
+        const { error: pingError } = await supabase.from('_test').select('*').limit(1)
+        if (pingError && pingError.message !== 'Invalid table') {
+          setConnectionStatus('Database Error')
+          logError('Database check failed', pingError)
+          return
+        }
+
+        setConnectionStatus(session ? 'Connected with session' : 'Connected, no session')
+        console.log('Connection test successful', {
+          hasSession: !!session,
+          timestamp: new Date().toISOString()
+        })
       } catch (err) {
-        logError('Supabase connection test error', err)
+        setConnectionStatus('Connection Failed')
+        logError('Connection test error', err)
       }
     }
     testConnection()
@@ -89,9 +106,12 @@ export function LoginForm() {
 
   return (
     <div className="w-[600px] h-[400px] bg-black border-2 border-green-500 rounded-lg p-8 font-mono text-green-500 overflow-hidden">
-      <div className="mb-4 flex items-center">
-        <span className="text-xs mr-2">█</span>
-        <span className="text-xs">TERMINAL v1.0.0</span>
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center">
+          <span className="text-xs mr-2">█</span>
+          <span className="text-xs">TERMINAL v1.0.0</span>
+        </div>
+        <span className="text-xs">{connectionStatus}</span>
       </div>
       <div className="mb-6">
         <p className="typing-effect">INITIALIZING SECURE LOGIN...</p>
