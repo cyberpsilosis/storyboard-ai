@@ -2,9 +2,11 @@ const PERPLEXITY_API_KEY = import.meta.env.VITE_PERPLEXITY_API_KEY;
 const API_URL = 'https://api.perplexity.ai/chat/completions';
 
 interface PerplexityResponse {
+  id: string;
   choices: {
     message: {
       content: string;
+      role: string;
     };
     index: number;
     finish_reason: string;
@@ -17,14 +19,17 @@ export const generateScript = async (prompt: string): Promise<string> => {
   }
 
   try {
+    console.log('Making request with prompt:', prompt);
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${PERPLEXITY_API_KEY}`
       },
       body: JSON.stringify({
-        model: "mixtral-8x7b-instruct",
+        model: "pplx-7b-online",
         messages: [
           {
             role: "system",
@@ -35,23 +40,33 @@ export const generateScript = async (prompt: string): Promise<string> => {
             content: prompt
           }
         ],
+        max_tokens: 4000,
         temperature: 0.7,
-        max_tokens: 2048,
         top_p: 0.9,
-        stream: false
       })
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      console.error('Perplexity API error:', {
-        status: response.status,
-        error: errorData
-      });
-      throw new Error(`API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Full API error response:', errorText);
+      
+      try {
+        const errorJson = JSON.parse(errorText);
+        console.error('Parsed error:', errorJson);
+      } catch (e) {
+        console.error('Raw error text:', errorText);
+      }
+      
+      throw new Error(`API error: ${response.status} - ${errorText}`);
     }
 
     const data: PerplexityResponse = await response.json();
+    console.log('API response:', data);
+
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response format from API');
+    }
+
     return data.choices[0].message.content;
   } catch (error) {
     console.error('Script generation error:', error);
