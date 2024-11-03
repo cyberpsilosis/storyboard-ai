@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Editor from '@monaco-editor/react'
 import { Button } from "@/components/ui/button"
 import { useAppDispatch, useAppSelector } from '@/hooks/redux-hooks'
-import { updatePlot, selectPlot, selectCh1, selectCh2 } from '@/features/input/inputSlice'
+import { updatePlot, updateCh1, updateCh2, selectPlot } from '@/features/input/inputSlice'
 import { useToast } from '@/hooks/use-toast'
 import { Icons } from '@/components/icons'
 import { generateScript } from '@/lib/perplexity'
@@ -11,8 +11,6 @@ import { Input } from "@/components/ui/input"
 export const ScriptEditor: React.FC = () => {
   const dispatch = useAppDispatch()
   const plotContent = useAppSelector(selectPlot)
-  const ch1 = useAppSelector(selectCh1)
-  const ch2 = useAppSelector(selectCh2)
   const [isGenerating, setIsGenerating] = useState(false)
   const [prompt, setPrompt] = useState('')
   const { toast } = useToast()
@@ -23,17 +21,34 @@ export const ScriptEditor: React.FC = () => {
     }
   }
 
-  const handleGenerateScript = () => {
-    console.log('Generate button clicked', { prompt, ch1, ch2 });
-    if (!ch1 || !ch2) {
-      toast({
-        title: "Missing Characters",
-        description: "Please define both characters before generating a script.",
-        variant: "destructive"
-      })
-      return
-    }
+  const generateCharacters = async (prompt: string) => {
+    const characterPrompt = `Based on this story prompt: "${prompt}"
+    Create two main characters that would make this story interesting.
+    For each character, provide:
+    - A brief but vivid description
+    - Their role in the story
+    - Key personality traits
+    
+    Format as JSON with character1 and character2 fields.
+    Example format:
+    {
+      "character1": "A retired detective with a photographic memory...",
+      "character2": "A tech-savvy street artist with a mysterious past..."
+    }`;
 
+    const charactersResponse = await generateScript(characterPrompt);
+    try {
+      const characters = JSON.parse(charactersResponse);
+      dispatch(updateCh1(characters.character1));
+      dispatch(updateCh2(characters.character2));
+      return characters;
+    } catch (error) {
+      console.error('Failed to parse characters:', error);
+      throw new Error('Failed to generate characters');
+    }
+  }
+
+  const handleGenerateScript = async () => {
     if (!prompt.trim()) {
       toast({
         title: "Missing Prompt",
@@ -45,22 +60,54 @@ export const ScriptEditor: React.FC = () => {
 
     setIsGenerating(true)
     
-    // For now, just log that we would generate a script
-    console.log('Would generate script with:', {
-      prompt,
-      ch1,
-      ch2
-    });
-    
-    // Mock successful generation
-    setTimeout(() => {
-      dispatch(updatePlot('Generated script would appear here...'))
-      setIsGenerating(false)
+    try {
+      // First generate characters
       toast({
-        title: "Script Generated",
-        description: "Your script has been generated successfully."
+        title: "Generating Characters",
+        description: "Creating characters for your story..."
       })
-    }, 1000)
+
+      const characters = await generateCharacters(prompt);
+
+      // Then generate the script
+      toast({
+        title: "Generating Script",
+        description: "Creating your script with the generated characters..."
+      })
+
+      const scriptPrompt = `Create a script for a story with the following elements:
+        
+        Story Prompt: ${prompt}
+
+        Characters:
+        Character 1: ${characters.character1}
+        Character 2: ${characters.character2}
+        
+        The script should include:
+        - A compelling narrative arc based on the prompt
+        - Natural dialogue between the characters
+        - Clear scene descriptions
+        - Emotional depth and character development
+        
+        Format the output as a proper screenplay.`;
+
+      const script = await generateScript(scriptPrompt)
+      dispatch(updatePlot(script))
+      
+      toast({
+        title: "Generation Complete",
+        description: "Your script and characters have been generated successfully."
+      })
+    } catch (error) {
+      console.error('Generation error:', error)
+      toast({
+        title: "Generation Failed",
+        description: error instanceof Error ? error.message : "Failed to generate content",
+        variant: "destructive"
+      })
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   return (
@@ -76,7 +123,7 @@ export const ScriptEditor: React.FC = () => {
         <Button
           type="button"
           onClick={handleGenerateScript}
-          disabled={isGenerating || !ch1 || !ch2 || !prompt.trim()}
+          disabled={isGenerating || !prompt.trim()}
           className="whitespace-nowrap"
         >
           {isGenerating ? (
@@ -87,7 +134,7 @@ export const ScriptEditor: React.FC = () => {
           ) : (
             <>
               <Icons.submit className="mr-2 h-4 w-4" />
-              Generate Script
+              Generate Story
             </>
           )}
         </Button>

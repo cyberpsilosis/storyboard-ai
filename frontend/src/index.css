@@ -94,12 +94,12 @@
 
 /* Add this to your existing CSS */
 @keyframes sparkle {
-  0% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.2) rotate(180deg); }
-  100% { transform: scale(1) rotate(360deg); }
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .sparkle-emoji {
   display: inline-block;
-  animation: sparkle 2s infinite linear;
+  animation: sparkle 3s infinite ease-in-out;
 }
