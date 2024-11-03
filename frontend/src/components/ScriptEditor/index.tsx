@@ -35,29 +35,34 @@ export const ScriptEditor: React.FC = () => {
   };
 
   const generateCharacters = async (prompt: string) => {
-    const characterPrompt = `Generate two characters for this story prompt: "${prompt}"
-    Return ONLY a JSON object with this exact format, no additional text:
+    const characterPrompt = `Based on this story prompt: "${prompt}"
+    Create two distinct characters. For each character, provide a brief but vivid description.
+    Format your response exactly like this example, with no additional text:
     {
-      "character1": "description here...",
-      "character2": "description here..."
+      "character1": "A grizzled forest ranger in his late 50s with decades of experience fighting wildfires. His weathered face and calloused hands tell stories of countless battles against nature's fury.",
+      "character2": "A young wildlife photographer who specializes in capturing images of deer in their natural habitat. She's driven by a deep connection to nature and a desire to document the impact of wildfires on local wildlife."
     }`;
 
     try {
+      console.log('Generating characters with prompt:', characterPrompt);
       const charactersResponse = await generateScript(characterPrompt);
+      console.log('Raw character response:', charactersResponse);
       
       // Try to extract JSON if it's wrapped in text
       const jsonMatch = charactersResponse.match(/\{[\s\S]*\}/);
       const jsonStr = jsonMatch ? jsonMatch[0] : charactersResponse;
+      console.log('Extracted JSON string:', jsonStr);
       
       try {
         const characters = JSON.parse(jsonStr);
-        if (!characters.character1 || !characters.character2) {
-          throw new Error('Invalid character format');
+        console.log('Parsed characters:', characters);
+        
+        if (typeof characters.character1 !== 'string' || typeof characters.character2 !== 'string') {
+          throw new Error('Invalid character format - expected string descriptions');
         }
         
-        // Update character states with the string descriptions
-        dispatch(updateCh1(characters.character1.toString()));
-        dispatch(updateCh2(characters.character2.toString()));
+        dispatch(updateCh1(characters.character1));
+        dispatch(updateCh2(characters.character2));
         
         return characters;
       } catch (parseError) {
