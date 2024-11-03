@@ -4,13 +4,22 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error(JSON.stringify({
-    timestamp: new Date().toISOString(),
-    error: 'Missing Supabase environment variables',
-    supabaseUrl: !!supabaseUrl,
-    supabaseAnonKey: !!supabaseAnonKey
-  }, null, 2))
-  throw new Error('Missing required environment variables')
+  throw new Error('Missing Supabase environment variables')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey) 
+// Ensure URL is properly formatted
+const formattedUrl = supabaseUrl.startsWith('http') 
+  ? supabaseUrl 
+  : `https://${supabaseUrl}`
+
+export const supabase = createClient(
+  formattedUrl,
+  supabaseAnonKey,
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
+    }
+  }
+) 
