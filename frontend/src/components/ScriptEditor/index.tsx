@@ -5,10 +5,13 @@ import { useAppDispatch, useAppSelector } from '@/hooks/redux-hooks'
 import { updatePlot, updateCh1, updateCh2, selectPlot, selectCh1, selectCh2 } from '@/features/input/inputSlice'
 import { useToast } from '@/hooks/use-toast'
 import { Icons } from '@/components/icons'
-import { generateScript } from '@/lib/perplexity'
+import { generateScript, generateStoryboardScenes } from '@/lib/perplexity'
 import { Input } from "@/components/ui/input"
 import { SpeechInput } from '@/components/SpeechInput'
 import { Textarea } from "@/components/ui/textarea"
+import { generateImage } from '@/lib/fal'
+import { Storyboard } from '@/components/Storyboard'
+import { storyboardService } from '@/lib/storyboard-service'
 
 export const ScriptEditor: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -18,6 +21,10 @@ export const ScriptEditor: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [prompt, setPrompt] = useState('')
   const { toast } = useToast()
+  const [generatedImages, setGeneratedImages] = useState<string[]>([])
+  const [showStoryboard, setShowStoryboard] = useState(false);
+  const [title, setTitle] = useState('Untitled Storyboard')
+  const [saving, setSaving] = useState(false)
 
   const handleSpeechInput = (transcript: string) => {
     setPrompt(transcript);
@@ -123,9 +130,103 @@ export const ScriptEditor: React.FC = () => {
     }
   }
 
+  const handleGenerateStoryboard = async () => {
+    if (!plotContent) {
+      toast({
+        title: "Missing Script",
+        description: "Please generate a script first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      toast({
+        title: "Generating Storyboard",
+        description: "Creating scene descriptions..."
+      });
+
+      const scenes = await generateStoryboardScenes(plotContent);
+      const images: string[] = [];
+
+      for (let i = 0; i < scenes.length; i++) {
+        toast({
+          title: `Generating Scene ${i + 1}`,
+          description: "Creating image..."
+        });
+
+        const imageUrl = await generateImage(scenes[i]);
+        images.push(imageUrl);
+      }
+
+      setGeneratedImages(images);
+      
+      toast({
+        title: "Storyboard Complete",
+        description: `Generated ${images.length} scenes.`
+      });
+
+    } catch (error) {
+      console.error('Storyboard generation error:', error);
+      toast({
+        title: "Generation Failed",
+        description: error instanceof Error ? error.message : "Failed to generate storyboard",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!plotContent || !generatedImages.length) {
+      toast({
+        title: "Missing Content",
+        description: "Please generate a script and storyboard first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const scenes = generatedImages.map((imageUrl, index) => ({
+        description: `Scene ${index + 1}`,
+        imageUrl
+      }));
+
+      await storyboardService.save({
+        title,
+        script: plotContent,
+        scenes
+      });
+
+      toast({
+        title: "Saved",
+        description: "Your storyboard has been saved successfully."
+      });
+    } catch (error) {
+      console.error('Save error:', error);
+      toast({
+        title: "Save Failed",
+        description: error instanceof Error ? error.message : "Failed to save storyboard",
+        variant: "destructive"
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 w-full h-full">
       <div className="flex gap-4 items-center">
+        <Input
+          placeholder="Enter storyboard title..."
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="max-w-xs font-medium"
+        />
         <Input
           placeholder="Enter your story prompt here..."
           value={prompt}
@@ -194,17 +295,21 @@ export const ScriptEditor: React.FC = () => {
 
       <div className="flex justify-between">
         <Button
-          onClick={() => {
-            toast({
-              title: "Generating Storyboard",
-              description: "Creating visual scenes from your script..."
-            });
-          }}
+          onClick={handleGenerateStoryboard}
           disabled={!plotContent || isGenerating}
           className="bg-green-600 hover:bg-green-700"
         >
-          <Icons.image className="mr-2 h-4 w-4" />
-          Generate Storyboard
+          {isGenerating ? (
+            <>
+              <Icons.loading className="mr-2 h-4 w-4 animate-spin" />
+              Generating Storyboard...
+            </>
+          ) : (
+            <>
+              <Icons.image className="mr-2 h-4 w-4" />
+              Generate Storyboard
+            </>
+          )}
         </Button>
         <Button 
           variant="outline" 
@@ -217,6 +322,55 @@ export const ScriptEditor: React.FC = () => {
           disabled={isGenerating || !plotContent}
         >
           Reset All
+        </Button>
+      </div>
+
+      {generatedImages.length > 0 && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+            {generatedImages.map((url, index) => (
+              <div 
+                key={index} 
+                className="relative aspect-video rounded-lg overflow-hidden cursor-pointer group"
+                onClick={() => setShowStoryboard(true)}
+              >
+                <img 
+                  src={url} 
+                  alt={`Scene ${index + 1}`}
+                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-2 text-sm">
+                  Scene {index + 1}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Storyboard 
+            images={generatedImages}
+            open={showStoryboard}
+            onClose={() => setShowStoryboard(false)}
+          />
+        </>
+      )}
+
+      <div className="flex justify-between">
+        <Button
+          onClick={handleSave}
+          disabled={saving || !plotContent || !generatedImages.length}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          {saving ? (
+            <>
+              <Icons.loading className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Icons.save className="mr-2 h-4 w-4" />
+              Save Storyboard
+            </>
+          )}
         </Button>
       </div>
     </div>

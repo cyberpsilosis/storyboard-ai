@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import { createClient, Session, AuthChangeEvent } from '@supabase/supabase-js'
 import { ThemeProvider } from './providers/theme-provider'
 import { ScriptEditor } from '@/components/ScriptEditor'
-import { ShotList } from '@/components/ShotList'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { LoginForm } from '@/components/auth/login'
 import { Button } from '@/components/ui/button'
+import { StoryboardGallery } from '@/components/StoryboardGallery'
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -61,7 +61,10 @@ function App() {
         </div>
         <div className="grid gap-8">
           <ScriptEditor />
-          <ShotList />
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold mb-6">Your Storyboards</h2>
+            <StoryboardGallery />
+          </div>
         </div>
       </div>
       <Toaster />

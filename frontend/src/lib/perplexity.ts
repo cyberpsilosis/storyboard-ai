@@ -72,4 +72,50 @@ export const generateScript = async (prompt: string): Promise<string> => {
     console.error('Script generation error:', error);
     throw error;
   }
+}
+
+export const generateStoryboardScenes = async (script: string): Promise<string[]> => {
+  const scenePrompt = `Analyze this script and create 5 key scene descriptions for image generation.
+    Each scene should be a vivid, detailed description that captures a crucial moment.
+    Format each scene as a single paragraph, separated by ||| delimiters.
+    Focus on visual elements, setting, character positions, and mood.
+    Script:
+    ${script}`;
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-sonar-huge-128k-online",
+        messages: [
+          {
+            role: "system",
+            content: "You are a visual scene director. Create detailed, vivid scene descriptions for image generation."
+          },
+          {
+            role: "user",
+            content: scenePrompt
+          }
+        ],
+        max_tokens: 4000,
+        temperature: 0.7,
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data: PerplexityResponse = await response.json();
+    const scenes = data.choices[0].message.content.split('|||').map(scene => scene.trim());
+    return scenes;
+  } catch (error) {
+    console.error('Scene generation error:', error);
+    throw error;
+  }
 } 
