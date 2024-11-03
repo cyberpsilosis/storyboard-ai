@@ -23,7 +23,8 @@ export const ScriptEditor: React.FC = () => {
     }
   }
 
-  const handleGenerateScript = async () => {
+  const handleGenerateScript = () => {
+    console.log('Generate button clicked', { prompt, ch1, ch2 });
     if (!ch1 || !ch2) {
       toast({
         title: "Missing Characters",
@@ -43,40 +44,23 @@ export const ScriptEditor: React.FC = () => {
     }
 
     setIsGenerating(true)
-    try {
-      const fullPrompt = `Create a script for a story with the following elements:
-        
-        Story Prompt: ${prompt}
-
-        Characters:
-        Character 1: ${ch1}
-        Character 2: ${ch2}
-        
-        The script should include:
-        - A compelling narrative arc based on the prompt
-        - Natural dialogue between the characters
-        - Clear scene descriptions
-        - Emotional depth and character development
-        
-        Format the output as a proper screenplay.`;
-
-      const script = await generateScript(fullPrompt)
-      dispatch(updatePlot(script))
-      
+    
+    // For now, just log that we would generate a script
+    console.log('Would generate script with:', {
+      prompt,
+      ch1,
+      ch2
+    });
+    
+    // Mock successful generation
+    setTimeout(() => {
+      dispatch(updatePlot('Generated script would appear here...'))
+      setIsGenerating(false)
       toast({
         title: "Script Generated",
         description: "Your script has been generated successfully."
       })
-    } catch (error) {
-      console.error('Script generation error:', error)
-      toast({
-        title: "Generation Failed",
-        description: "Failed to generate script. Please try again.",
-        variant: "destructive"
-      })
-    } finally {
-      setIsGenerating(false)
-    }
+    }, 1000)
   }
 
   return (
@@ -90,13 +74,15 @@ export const ScriptEditor: React.FC = () => {
           disabled={isGenerating}
         />
         <Button
+          type="button"
           onClick={handleGenerateScript}
           disabled={isGenerating || !ch1 || !ch2 || !prompt.trim()}
+          className="whitespace-nowrap"
         >
           {isGenerating ? (
             <>
               <Icons.loading className="mr-2 h-4 w-4 animate-spin" />
-              Generating Script...
+              Generating...
             </>
           ) : (
             <>

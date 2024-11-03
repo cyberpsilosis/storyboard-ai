@@ -49,7 +49,10 @@ function App() {
     <ThemeProvider>
       <div className="container mx-auto py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">AI Storyboarder</h1>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            AI Storyboarder
+            <span className="sparkle-emoji">✨</span>
+          </h1>
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <Button 
