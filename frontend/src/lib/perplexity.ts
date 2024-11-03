@@ -29,7 +29,7 @@ export const generateScript = async (prompt: string): Promise<string> => {
         'Authorization': `Bearer ${PERPLEXITY_API_KEY}`
       },
       body: JSON.stringify({
-        model: "codellama-34b-instruct",
+        model: "llama-3.1-sonar-huge-128k-online",
         messages: [
           {
             role: "system",
