@@ -12,15 +12,18 @@ export const SpeechInput: React.FC<SpeechInputProps> = ({ onTranscript }) => {
   const startListening = () => {
     if ('webkitSpeechRecognition' in window) {
       const recognition = new (window as any).webkitSpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.continuous = true;
+      recognition.interimResults = true;
 
       recognition.onstart = () => {
         setIsListening(true);
       };
 
       recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0])
+          .map(result => result.transcript)
+          .join('');
         onTranscript(transcript);
       };
 
@@ -45,14 +48,14 @@ export const SpeechInput: React.FC<SpeechInputProps> = ({ onTranscript }) => {
       variant="outline"
       size="icon"
       onClick={startListening}
-      className={`transition-all duration-200 ${
+      className={`transition-all duration-300 ${
         isListening 
-          ? 'bg-red-100 dark:bg-red-900 animate-pulse ring-2 ring-red-500' 
-          : ''
+          ? 'bg-red-100 dark:bg-red-900 ring-2 ring-red-500' 
+          : 'hover:bg-red-50 dark:hover:bg-red-900/50'
       }`}
     >
-      <Icons.mic className={`h-4 w-4 ${
-        isListening ? 'text-red-500' : ''
+      <Icons.mic className={`h-4 w-4 transition-colors duration-300 ${
+        isListening ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'
       }`} />
     </Button>
   );
