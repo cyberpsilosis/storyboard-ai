@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
@@ -11,6 +11,27 @@ interface StoryboardProps {
 
 export const Storyboard: React.FC<StoryboardProps> = ({ images, onClose, open }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (!open) return;
+      
+      switch (e.key) {
+        case 'ArrowLeft':
+          setCurrentIndex(i => Math.max(0, i - 1));
+          break;
+        case 'ArrowRight':
+          setCurrentIndex(i => Math.min(images.length - 1, i + 1));
+          break;
+        case 'Escape':
+          onClose();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [open, images.length, onClose]);
 
   const handleDownload = async () => {
     try {
