@@ -22,6 +22,14 @@ export function LoginForm() {
   const [cursor, setCursor] = useState(true)
   const [connectionStatus, setConnectionStatus] = useState<string>('Checking connection...')
 
+  // Cursor blink effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCursor(prev => !prev)
+    }, 500)
+    return () => clearInterval(interval)
+  }, [])
+
   // Test Supabase connection and user status
   useEffect(() => {
     const testConnection = async () => {
