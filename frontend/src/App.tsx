@@ -3,11 +3,11 @@ import { createClient, Session, AuthChangeEvent } from '@supabase/supabase-js'
 import { ThemeProvider } from './providers/theme-provider'
 import { ScriptEditor } from '@/components/ScriptEditor'
 import { ShotList } from '@/components/ShotList'
-import { CharacterInputs } from '@/components/CharacterInputs'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { LoginForm } from '@/components/auth/login'
 import { Button } from '@/components/ui/button'
+import { BunnyAnimation } from '@/components/BunnyAnimation'
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -47,12 +47,9 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto py-8 relative">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            AI Storyboarder
-            <span className="sparkle-emoji">✨</span>
-          </h1>
+          <h1 className="text-3xl font-bold">AI Storyboarder</h1>
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <Button 
@@ -64,12 +61,10 @@ function App() {
           </div>
         </div>
         <div className="grid gap-8">
-          <div className="grid md:grid-cols-[2fr,1fr] gap-8">
-            <ScriptEditor />
-            <CharacterInputs />
-          </div>
+          <ScriptEditor />
           <ShotList />
         </div>
+        <BunnyAnimation />
       </div>
       <Toaster />
     </ThemeProvider>
