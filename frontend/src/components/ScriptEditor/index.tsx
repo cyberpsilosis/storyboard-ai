@@ -15,6 +15,12 @@ export const ScriptEditor: React.FC = () => {
   const [prompt, setPrompt] = useState('')
   const { toast } = useToast()
 
+  const handleEditorChange = (value: string | undefined) => {
+    if (value !== undefined) {
+      dispatch(updatePlot(value))
+    }
+  }
+
   const generateCharacters = async (prompt: string) => {
     const characterPrompt = `Generate two characters for this story prompt: "${prompt}"
     Return ONLY a JSON object with this exact format, no additional text:
