@@ -9,7 +9,7 @@ import { generateScript, generateStoryboardScenes, generateTitle } from '@/lib/p
 import { Input } from "@/components/ui/input"
 import { SpeechInput } from '@/components/SpeechInput'
 import { Textarea } from "@/components/ui/textarea"
-import { generateImage } from '@/lib/fal'
+import { generateImage } from '@/lib/together'
 import { Storyboard } from '@/components/Storyboard'
 import { storyboardService } from '@/lib/storyboard-service'
 
@@ -159,11 +159,6 @@ export const ScriptEditor: React.FC = () => {
 
     setIsGenerating(true);
     try {
-      toast({
-        title: "Generating Storyboard",
-        description: "Creating scene descriptions..."
-      });
-
       const scenes = await generateStoryboardScenes(plotContent);
       const images: string[] = [];
 
