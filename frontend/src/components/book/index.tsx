@@ -1,26 +1,42 @@
 import { selectCh1Avatar, selectCh2Avatar, selectCharacter1, selectCharacter2, selectCover, selectForeword, selectPlot, selectPoems, selectStories, selectTitle } from "@/features/storyboard/storyboardSlice";
 import { useAppSelector } from "@/hooks/redux-hooks";
 import html2canvas from 'html2canvas';
-import React, { LegacyRef, useEffect, useState } from 'react';
+import React, { LegacyRef, useState, useEffect } from 'react';
 import { Icons } from "../icons";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Skeleton } from "../ui/skeleton";
 
-export const Book = () => {
+interface Story {
+  id: string;
+  content: string;
+  title: string;
+  url: string;
+}
+
+interface Poem {
+  id: string;
+  content: string;
+  url: string;
+}
+
+interface BookProps {
+  stories: Story[];
+}
+
+export const Book: React.FC<BookProps> = () => {
     const title = useAppSelector(selectTitle)
     const foreword = useAppSelector(selectForeword)
     const character1 = useAppSelector(selectCharacter1)
     const character2 = useAppSelector(selectCharacter2)
-    const stories = useAppSelector(selectStories)
-    const poems = useAppSelector(selectPoems)
-    const plot = useAppSelector(selectPlot)
     const cover = useAppSelector(selectCover)
     const ch1_avatar = useAppSelector(selectCh1Avatar)
     const ch2_avatar = useAppSelector(selectCh2Avatar)
+    const plot = useAppSelector(selectPlot)
+    const stories = useAppSelector(selectStories) as Story[]
+    const poems = useAppSelector(selectPoems) as Poem[]
 
     const exportRef = React.createRef()
-
 
     const handleDownloadImage = async () => {
         const element = exportRef.current;
@@ -54,7 +70,7 @@ export const Book = () => {
             </Button>
             <TitlePage title={title} foreword={foreword} plot={plot} bg={cover} />
             <CharacterPage character_1={character1} character_2={character2} ch1_avatar={ch1_avatar} ch2_avatar={ch2_avatar} />
-            {stories.map((story, index) => (
+            {stories.map((story: Story, index: number) => (
                 <div key={story.id}>
                     <ChapterTitlePage title={story.title} key={story.id} bg={story.url} />
                     <br />
@@ -66,7 +82,6 @@ export const Book = () => {
             <PoemPage poem={'fin.'} />
         </div>
     );
-
 }
 
 export function TitlePage({ title, foreword, bg = 'https://i.imgur.com/tHdtL3w.jpg', plot }: { title: string, foreword: string, bg?: string, plot: string }) {

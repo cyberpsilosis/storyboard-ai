@@ -1,42 +1,38 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
-export interface InputStateInterface {
+interface InputState {
     plot: string,
     ch1: string,
     ch2: string
 }
 
-const initialState: InputStateInterface = {
+const initialState: InputState = {
     plot: "",
     ch1: "",
     ch2: ""
 }
-
 
 export const inputSlice = createSlice({
     name: "input",
     initialState,
 
     reducers: {
-        // reducer to initialize initialState with payload of type inputstateinterface
-        setInput: (state, action: PayloadAction<InputStateInterface>) => {
+        setInput: (state: InputState, action: PayloadAction<InputState>) => {
             state.plot = action.payload.plot
             state.ch1 = action.payload.ch1
             state.ch2 = action.payload.ch2
         },
-        // reducer to update plot
-        updatePlot: (state, action) => {
+        updatePlot: (state: InputState, action) => {
             state.plot = action.payload
         },
-        updateCh1: (state, action) => {
+        updateCh1: (state: InputState, action) => {
             state.ch1 = action.payload
         },
-        updateCh2: (state, action) => {
+        updateCh2: (state: InputState, action) => {
             state.ch2 = action.payload
         }
     }
 })
-
 
 export const { setInput, updatePlot, updateCh1, updateCh2 } = inputSlice.actions
 

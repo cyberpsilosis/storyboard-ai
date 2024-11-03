@@ -1,90 +1,75 @@
-import { Book, LoadingPage } from '@/components/book'
-import { CommandCombobox } from '@/components/combo-box'
-import { Icons } from '@/components/icons'
+import { useEffect, useState } from 'react'
+import { createClient, Session, AuthChangeEvent } from '@supabase/supabase-js'
+import { ThemeProvider } from './providers/theme-provider'
+import { ScriptEditor } from '@/components/ScriptEditor'
+import { ShotList } from '@/components/ShotList'
+import { CharacterInputs } from '@/components/CharacterInputs'
+import { Toaster } from '@/components/ui/toaster'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { LoginForm } from '@/components/auth/login'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { Textarea } from '@/components/ui/textarea'
-import { selectCh1, selectCh2, selectInput, selectPlot, updateCh1, updateCh2, updatePlot } from '@/features/input/inputSlice'
-import { StoryboardStateInferface, initialize } from '@/features/storyboard/storyboardSlice'
-import { useAppDispatch, useAppSelector } from '@/hooks/redux-hooks'
-import { SectionLayout } from '@/sections/home-page'
-import { preset_character1, preset_character2, preset_plot } from '@/types/presets'
-import { homepageConfig as cfg } from '@/types/site'
-import { useState } from 'react'
 
-
-export type ComboBoxType = 'plot' | 'ch1' | 'ch2'
-
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+)
 
 function App() {
+  const [session, setSession] = useState<Session | null>(null)
 
-  const dispatch = useAppDispatch()
-  const input = useAppSelector(selectInput)
-  const plot = useAppSelector(selectPlot)
-  const ch1 = useAppSelector(selectCh1)
-  const ch2 = useAppSelector(selectCh2)
-  const [loading, setLoading] = useState(false)
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
 
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
+      setSession(session)
+    })
 
+    return () => subscription.unsubscribe()
+  }, [])
 
-
-  const handleClick = async () => {
-    setLoading(true)
-    if (input) {
-      console.log(JSON.stringify(input))
-      try {
-        const response = await fetch('http://127.0.0.1:8000/book/generate', {
-          method: 'POST',
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ "plot": plot, "ch1": ch1, "ch2": ch2 })
-        })
-
-        const data: StoryboardStateInferface = await response.json()
-        if (data) {
-          console.log(JSON.stringify(data, null, 2))
-          dispatch(initialize(data))
-          setLoading(false)
-        }
-      } catch (error) {
-        console.log(error)
-      }
-      setLoading(false)
-    }
+  if (!session) {
+    return (
+      <ThemeProvider>
+        <div className="flex min-h-screen items-center justify-center">
+          <LoginForm />
+        </div>
+        <div className="fixed top-4 right-4">
+          <ThemeToggle />
+        </div>
+        <Toaster />
+      </ThemeProvider>
+    )
   }
 
   return (
-
-    <div className="grid grid-cols-6">
-      <div className="fixed w-[300px] grid items-start h-screen col-span-1 bg-white border-r dark:border-r-slate-700 border-r-slate-100 dark:bg-slate-950">
-        <div className="[&_#section-label]:text-sm">
-          <SectionLayout sectionConfig={cfg.plot}>
-            <Textarea placeholder="Enter a compelling plot or select a preset." onChange={(e) => dispatch(updatePlot(e.target.value))} id="message-2" value={plot} className="my-4 bg-slate-50 resize-none h-[33vh] dark:bg-slate-950" />
-            <CommandCombobox frameworks={preset_plot} type='plot' />
-          </SectionLayout>
-          <SectionLayout sectionConfig={cfg.characters}>
-            <Textarea placeholder="Enter character#1 bio." onChange={(e) => dispatch(updateCh1(e.target.value))} id="message-2" value={ch1} className="resize-none my-4 h-[10vh] bg-slate-50 dark:bg-slate-950" />
-            <CommandCombobox frameworks={preset_character2} type='ch1' />
-            <Separator className="my-4" />
-            <Textarea placeholder="Enter character#2 bio." onChange={(e) => dispatch(updateCh2(e.target.value))} id="message-2" value={ch2} className="resize-none my-4 h-[10vh] bg-slate-50 dark:bg-slate-950" />
-            <CommandCombobox frameworks={preset_character1} type='ch2' />
-            <Button className="h-[4rem] text-4xl my-10 flex" onClick={() => handleClick()}>
-              {loading && <Icons.loading className="w-8 h-8 animate-spin" />}
-              {!loading && <Icons.submit className="w-8 h-8" />}
-              {/* {isLoading && isError && <Icons.error className="w-8 h-8" />} */}
+    <ThemeProvider>
+      <div className="container mx-auto py-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">AI Storyboarder</h1>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <Button 
+              variant="ghost" 
+              onClick={() => supabase.auth.signOut()}
+            >
+              Sign Out
             </Button>
-          </SectionLayout>
+          </div>
+        </div>
+        <div className="grid gap-8">
+          <div className="grid md:grid-cols-[2fr,1fr] gap-8">
+            <ScriptEditor />
+            <CharacterInputs />
+          </div>
+          <ShotList />
         </div>
       </div>
-      <div className="grid col-start-2 col-span-full">
-        <ScrollArea>
-          {!loading && <Book />}
-          {loading && <LoadingPage />}
-        </ScrollArea>
-      </div>
-    </div>
+      <Toaster />
+    </ThemeProvider>
   )
 }
 

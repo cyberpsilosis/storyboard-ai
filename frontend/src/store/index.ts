@@ -1,16 +1,15 @@
-import inputReducer from '@/features/input/inputSlice'
-import sbReducer from '@/features/storyboard/storyboardSlice'
 import { configureStore } from '@reduxjs/toolkit'
-// ...
+import inputReducer from '@/features/input/inputSlice'
+import shotsReducer from '@/features/shots/shotsSlice'
+import storyboardReducer from '@/features/storyboard/storyboardSlice'
 
 export const store = configureStore({
-    reducer: {
-        storyboard: sbReducer,
-        input: inputReducer,
-    },
+  reducer: {
+    input: inputReducer,
+    shots: shotsReducer,
+    storyboard: storyboardReducer,
+  },
 })
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch
