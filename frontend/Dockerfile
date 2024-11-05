@@ -8,8 +8,8 @@ COPY ./public ./public
 COPY ./dist ./dist
 # ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm install
-# RUN npm run build
-CMD [ "npm", "run", "build" ]
+RUN npm run build
+CMD [ "npm", "start" ]
 # RUN npm run dev
 
 # Build step #2: build an Caddy container
