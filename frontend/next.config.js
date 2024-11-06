@@ -9,6 +9,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true
   },
+  appDir: true,
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
