@@ -9,17 +9,14 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true
   },
-  // Configure page extensions and directories
-  pageExtensions: ['tsx', 'ts'],
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      'next': require.resolve('next')
+      'next': require.resolve('next'),
+      'react': require.resolve('react')
     }
     return config;
   },
-  // Ensure both app and pages directories are used
-  useFileSystemPublicRoutes: true,
 }
 
 module.exports = nextConfig 
