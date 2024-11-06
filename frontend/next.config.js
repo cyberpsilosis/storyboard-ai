@@ -9,14 +9,27 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       'next': require.resolve('next'),
-      'react': require.resolve('react')
+      'react': require.resolve('react'),
+      'react/jsx-runtime': require.resolve('react/jsx-runtime'),
+      'react/jsx-dev-runtime': require.resolve('react/jsx-dev-runtime')
     }
-    return config;
+
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false
+      }
+    }
+
+    return config
   },
+  transpilePackages: ['react', 'react-dom']
 }
 
 module.exports = nextConfig 
