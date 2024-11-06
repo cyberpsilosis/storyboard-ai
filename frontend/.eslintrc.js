@@ -26,7 +26,26 @@ module.exports = {
     // Ensure React is in scope
     'react/react-in-jsx-scope': 'off',
     // Configure exhaustive-deps as warning instead of error
-    'react-hooks/exhaustive-deps': 'warn'
+    'react-hooks/exhaustive-deps': 'warn',
+    // Allow Three.js props
+    'react/no-unknown-property': ['error', { 
+      ignore: [
+        'position',
+        'args',
+        'castShadow',
+        'intensity',
+        'roughness',
+        'metalness',
+        'transparent',
+        'cmdk-input-wrapper'
+      ]
+    }],
+    // Disable prop-types since we're using TypeScript
+    'react/prop-types': 'off',
+    // Allow unescaped entities
+    'react/no-unescaped-entities': 'off',
+    // Convert img element warning to error to enforce Next/Image
+    '@next/next/no-img-element': 'error'
   },
   settings: {
     react: {
