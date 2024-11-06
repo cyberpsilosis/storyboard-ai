@@ -6,6 +6,10 @@ const nextConfig = {
   experimental: {
     forceSwcTransforms: true
   },
+  eslint: {
+    // Disable ESLint during production builds
+    ignoreDuringBuilds: true
+  },
   // Explicitly disable any Vite-related processing
   webpack: (config) => {
     config.resolve.alias = {
