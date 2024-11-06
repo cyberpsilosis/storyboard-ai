@@ -4,8 +4,7 @@ const nextConfig = {
   output: 'standalone',
   distDir: '.next',
   experimental: {
-    forceSwcTransforms: true,
-    appDir: true
+    forceSwcTransforms: true
   },
   eslint: {
     ignoreDuringBuilds: true

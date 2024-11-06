@@ -7,9 +7,10 @@ import { SessionProvider } from './contexts/session-context'
 import { CreditsProvider } from './contexts/credits-context'
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabase'
+import { Session } from '@supabase/supabase-js'
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState(null)
+  const [session, setSession] = useState<Session | null>(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
