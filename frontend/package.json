@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "clean": "./clean.sh",
     "dev": "next dev",
     "build": "next build",
     "vercel-build": "DISABLE_ESLINT_PLUGIN=true next build",

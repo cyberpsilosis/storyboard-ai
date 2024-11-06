@@ -1,7 +1,7 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "buildCommand": "cd frontend && find . -type d -name 'pages' -exec rm -rf {} + && npm run vercel-build",
+  "buildCommand": "cd frontend && chmod +x clean.sh && ./clean.sh && npm run vercel-build",
   "outputDirectory": "frontend/.next",
   "builds": [
     {
