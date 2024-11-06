@@ -1,4 +1,4 @@
-import { Providers } from '@/providers'
+import { Providers } from '../providers'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
