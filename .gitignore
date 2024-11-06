@@ -43,3 +43,7 @@ yarn-error.log*
 .env.development
 .env.production
 .env.*
+
+# Next.js
+.next
+frontend/pages

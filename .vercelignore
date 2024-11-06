@@ -12,4 +12,10 @@ node_modules
 # Build output
 dist
 .next
-out 
+out
+
+# Pages
+**/pages
+**/pages/**
+frontend/pages
+frontend/pages/** 
