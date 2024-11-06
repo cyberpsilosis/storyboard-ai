@@ -1,7 +1,7 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "buildCommand": "cd frontend && find . -type d -name pages -exec rm -rf {} + && npm install && npm run vercel-build",
+  "buildCommand": "cd frontend && rm -rf pages && rm -rf pages/_app.tsx && rm -rf pages/_document.tsx && rm -rf pages/index.tsx && npm install && npm run vercel-build",
   "outputDirectory": "frontend/.next",
   "builds": [
     {
