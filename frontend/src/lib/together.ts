@@ -1,3 +1,53 @@
+const TOGETHER_API_KEY = process.env.NEXT_PUBLIC_TOGETHER_API_KEY;
+
+interface GenerationResponse {
+  output: {
+    text: string;
+  };
+}
+
+export const generateText = async (prompt: string): Promise<string> => {
+  if (!TOGETHER_API_KEY) {
+    throw new Error('Together API key not configured');
+  }
+
+  try {
+    console.log('Generating text with prompt:', prompt);
+
+    const response = await fetch('https://api.together.xyz/inference', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${TOGETHER_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+        prompt: prompt,
+        max_tokens: 1024,
+        temperature: 0.7,
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Together API error:', error);
+      throw new Error(`API error: ${response.status} - ${error}`);
+    }
+
+    const data: GenerationResponse = await response.json();
+    console.log('Together API response:', data);
+
+    if (!data.output?.text) {
+      throw new Error('No text generated');
+    }
+
+    return data.output.text;
+  } catch (error) {
+    console.error('Text generation error:', error);
+    throw error;
+  }
+}
+
 export const fetchCredits = async (session: any): Promise<{ text: number; image: number }> => {
   try {
     const response = await fetch('http://localhost:3001/api/credits/together', {
