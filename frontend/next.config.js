@@ -9,6 +9,9 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true
   },
+  // Force App Router
+  useFileSystemPublicRoutes: true,
+  pageExtensions: ['tsx', 'ts'],
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
