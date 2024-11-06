@@ -1,7 +1,7 @@
 'use client'
 
-import App from '@/App'
 import { Suspense } from 'react'
+import App from '../App'
 
 export default function Home() {
   return (
