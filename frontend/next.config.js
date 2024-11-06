@@ -18,6 +18,8 @@ const nextConfig = {
     }
     return config;
   },
+  // Ensure both app and pages directories are used
+  useFileSystemPublicRoutes: true,
 }
 
 module.exports = nextConfig 
