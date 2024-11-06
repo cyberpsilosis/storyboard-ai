@@ -50,7 +50,7 @@ export const generateText = async (prompt: string): Promise<string> => {
 
 export const fetchCredits = async (session: any): Promise<{ text: number; image: number }> => {
   try {
-    const response = await fetch('http://localhost:3001/api/credits/together', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits/together`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
@@ -77,7 +77,7 @@ export const fetchCredits = async (session: any): Promise<{ text: number; image:
 
 export const deductImageCredits = async (session: any, count: number = 1): Promise<number> => {
   try {
-    const response = await fetch('http://localhost:3001/api/credits/deduct/image', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/credits/deduct/image`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
@@ -109,7 +109,7 @@ export const generateCharacterImage = async (session: any, description: string):
     const response = await fetch('https://api.together.xyz/v1/images/generations', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${import.meta.env.VITE_TOGETHER_API_KEY}`,
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_TOGETHER_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -147,7 +147,7 @@ export const generateStoryboardImage = async (session: any, description: string)
     const response = await fetch('https://api.together.xyz/v1/images/generations', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${import.meta.env.VITE_TOGETHER_API_KEY}`,
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_TOGETHER_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
