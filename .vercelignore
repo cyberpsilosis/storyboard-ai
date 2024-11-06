@@ -1,3 +1,15 @@
+# Vite files
 vite.config.js
 vite.config.ts
-public/vite.svg 
+public/vite.svg
+
+# Development files
+node_modules
+.git
+.env.local
+.env.*.local
+
+# Build output
+dist
+.next
+out 

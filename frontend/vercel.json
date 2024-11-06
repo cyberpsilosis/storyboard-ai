@@ -1,4 +1,12 @@
 {
   "version": 2,
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": ".next",
+  "builds": [
+    {
+      "src": "next.config.js",
+      "use": "@vercel/next"
+    }
+  ]
 } 
