@@ -6,8 +6,10 @@
   "builds": [
     {
       "src": "frontend/next.config.js",
-      "use": "@vercel/next"
+      "use": "@vercel/next",
+      "config": {
+        "skipBuildCache": true
+      }
     }
-  ],
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./frontend/pages/"
+  ]
 } 

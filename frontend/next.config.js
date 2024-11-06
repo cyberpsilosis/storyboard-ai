@@ -12,6 +12,10 @@ const nextConfig = {
   // Force App Router
   useFileSystemPublicRoutes: true,
   pageExtensions: ['tsx', 'ts'],
+  // Disable Pages Router
+  trailingSlash: false,
+  skipMiddlewareUrlNormalize: true,
+  skipTrailingSlashRedirect: true,
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
