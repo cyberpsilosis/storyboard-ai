@@ -9,13 +9,8 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true
   },
-  // Force App Router
-  useFileSystemPublicRoutes: true,
+  // Configure page extensions and directories
   pageExtensions: ['tsx', 'ts'],
-  // Disable Pages Router
-  trailingSlash: false,
-  skipMiddlewareUrlNormalize: true,
-  skipTrailingSlashRedirect: true,
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
