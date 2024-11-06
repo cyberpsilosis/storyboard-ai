@@ -4,12 +4,12 @@ const nextConfig = {
   output: 'standalone',
   distDir: '.next',
   experimental: {
-    forceSwcTransforms: true
+    forceSwcTransforms: true,
+    appDir: true
   },
   eslint: {
     ignoreDuringBuilds: true
   },
-  appDir: true,
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
