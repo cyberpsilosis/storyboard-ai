@@ -7,14 +7,11 @@ const nextConfig = {
     forceSwcTransforms: true
   },
   eslint: {
-    // Disable ESLint during production builds
     ignoreDuringBuilds: true
   },
-  // Explicitly disable any Vite-related processing
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      // Ensure we're using Next.js specific features
       'next': require.resolve('next')
     }
     return config;
