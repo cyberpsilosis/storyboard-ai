@@ -5,9 +5,10 @@ import { useToast } from "@/hooks/use-toast"
 
 interface SpeechInputProps {
   onTranscript: (text: string) => void;
+  disabled?: boolean;
 }
 
-export const SpeechInput: React.FC<SpeechInputProps> = ({ onTranscript }) => {
+export const SpeechInput: React.FC<SpeechInputProps> = ({ onTranscript, disabled }) => {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
@@ -129,6 +130,7 @@ export const SpeechInput: React.FC<SpeechInputProps> = ({ onTranscript }) => {
       }`}
       aria-pressed={isListening}
       aria-label={isListening ? "Stop listening" : "Start listening"}
+      disabled={disabled}
     >
       <Icons.mic className={`h-4 w-4 transition-colors duration-300 ${
         isListening ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'

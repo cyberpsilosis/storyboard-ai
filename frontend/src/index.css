@@ -1,105 +1,176 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Mono&display=swap");
-@import url("https://v1.fontapi.ir/css/SFProDisplay");
 @import url("https://fonts.googleapis.com/css2?family=Merriweather&display=swap");
 @import url('https://fonts.cdnfonts.com/css/zapfino');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-    :root {
-        --background: 0 0% 100%;
-        --foreground: 222.2 84% 4.9%;
-        --card: 0 0% 100%;
-        --card-foreground: 222.2 84% 4.9%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 222.2 84% 4.9%;
-        --primary: 222.2 47.4% 11.2%;
-        --primary-foreground: 210 40% 98%;
-        --secondary: 210 40% 96.1%;
-        --secondary-foreground: 222.2 47.4% 11.2%;
-        --muted: 210 40% 96.1%;
-        --muted-foreground: 215.4 16.3% 46.9%;
-        --accent: 210 40% 96.1%;
-        --accent-foreground: 222.2 47.4% 11.2%;
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 214.3 31.8% 91.4%;
-        --input: 214.3 31.8% 91.4%;
-        --ring: 222.2 84% 4.9%;
-        --radius: 0.5rem;
-    }
-    .dark {
-        --background: 222.2 84% 4.9%;
-        --foreground: 210 40% 98%;
-        --card: 222.2 84% 4.9%;
-        --card-foreground: 210 40% 98%;
-        --popover: 222.2 84% 4.9%;
-        --popover-foreground: 210 40% 98%;
-        --primary: 210 40% 98%;
-        --primary-foreground: 222.2 47.4% 11.2%;
-        --secondary: 217.2 32.6% 17.5%;
-        --secondary-foreground: 210 40% 98%;
-        --muted: 217.2 32.6% 17.5%;
-        --muted-foreground: 215 20.2% 65.1%;
-        --accent: 217.2 32.6% 17.5%;
-        --accent-foreground: 210 40% 98%;
-        --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 217.2 32.6% 17.5%;
-        --input: 217.2 32.6% 17.5%;
-        --ring: 212.7 26.8% 83.9%;
-    }
-    * {
-        @apply border-border;
-    }
-    body {
-        @apply bg-background text-foreground;
-    }
+  :root {
+    --background: 0 0% 96%;
+    --surface: 0 0% 100%;
+    --terminal-bg: 0 0% 10%;
+    --terminal-border: 102 255 102;
+    --terminal-text: 102 255 102;
+    --text: 0 0% 10%;
+    --input-bg: 0 0% 100%;
+    --input-border: 0 0% 88%;
+    --secondary-text: 0 0% 29%;
+  }
+
+  .dark {
+    --background: 240 6% 10%;
+    --surface: 240 5% 26%;
+    --terminal-bg: 240 10% 4%;
+    --terminal-border: 102 255 102;
+    --terminal-text: 102 255 102;
+    --text: 0 0% 98%;
+    --input-bg: 240 5% 26%;
+    --input-border: 240 5% 34%;
+    --secondary-text: 240 5% 84%;
+  }
+
+  html {
+    font-family: 'Space Mono', monospace;
+  }
+
+  body {
+    @apply bg-background text-text transition-colors duration-300;
+  }
+
+  input, textarea {
+    @apply bg-input-bg border-input-border text-text;
+    font-family: 'Space Mono', monospace !important;
+  }
+
+  .text-secondary {
+    @apply text-secondary-text;
+  }
 }
 
-/* Add these styles */
+:root {
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 210 40% 98%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.sparkle-emoji {
+  display: inline-block;
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
 @keyframes typing {
   from { width: 0 }
   to { width: 100% }
 }
 
-.typing-effect {
+.animate-typing {
+  display: inline-block;
   overflow: hidden;
   white-space: nowrap;
-  animation: typing 2s steps(40, end);
+  animation: typing 0.5s steps(30, end);
 }
 
-/* Add retro terminal scanlines effect */
-.terminal-scanline {
-  position: relative;
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(20px);
+    opacity: 0;
+  }
 }
 
-.terminal-scanline::after {
-  content: "";
-  position: absolute;
+.particle {
+  position: fixed;
+  width: 2px;
+  height: 2px;
+  background-color: rgba(102, 255, 102, 0.2);
+  pointer-events: none;
+}
+
+.particle-container {
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 255, 0, 0.15),
-    rgba(0, 255, 0, 0.15) 1px,
-    transparent 1px,
-    transparent 2px
-  );
   pointer-events: none;
+  z-index: -1;
+  background-color: #1a1a1a;
+  overflow: hidden;
 }
 
-/* Add this to your existing CSS */
-@keyframes sparkle {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.8; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.sparkle-emoji {
-  display: inline-block;
-  animation: sparkle 3s infinite ease-in-out;
-}
+/* Generate multiple particles with different animations */
+.particle:nth-child(1) { animation: float-particle 8s infinite linear; }
+.particle:nth-child(2) { animation: float-particle 12s infinite linear 1s; }
+.particle:nth-child(3) { animation: float-particle 10s infinite linear 2s; }
+.particle:nth-child(4) { animation: float-particle 14s infinite linear 0s; }
+.particle:nth-child(5) { animation: float-particle 11s infinite linear 3s; }
+.particle:nth-child(6) { animation: float-particle 9s infinite linear 2s; }
+.particle:nth-child(7) { animation: float-particle 13s infinite linear 1s; }
+.particle:nth-child(8) { animation: float-particle 15s infinite linear 2s; }

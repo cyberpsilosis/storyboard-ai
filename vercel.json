@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "buildCommand": "find . -type d -name pages -exec rm -rf {} + && cd frontend && npm install && npm run vercel-build",
+  "outputDirectory": "frontend/.next",
+  "builds": [
+    {
+      "src": "frontend/next.config.js",
+      "use": "@vercel/next",
+      "config": {
+        "skipBuildCache": true,
+        "zeroConfig": false
+      }
+    }
+  ]
+} 

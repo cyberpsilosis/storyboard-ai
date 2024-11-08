@@ -1,19 +1,21 @@
 # Build step #1: build the React front end
-FROM node:lts-alpine as build-step
+FROM node:lts-alpine
 WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json  ./
-COPY ./src ./src
-COPY ./public ./public
-COPY ./dist ./dist
-# ENV NODE_OPTIONS=--openssl-legacy-provider
-RUN npm install
-# RUN npm run build
-CMD [ "npm", "run", "build" ]
-# RUN npm run dev
 
-# Build step #2: build an Caddy container
-FROM caddy:alpine
-EXPOSE 80
-EXPOSE 443
-COPY --from=build-step /app/dist /usr/share/caddy
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application
+COPY . .
+
+# Build the Next.js application
+RUN npm run build
+
+# Expose the port Next.js runs on
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "start"]

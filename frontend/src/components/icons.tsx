@@ -11,14 +11,16 @@ import {
   Trash2,
   Plus,
   AlertTriangle,
-  Film
+  Film,
+  PenTool,
+  Copy
 } from 'lucide-react'
 
 export const Icons = {
   mic: Mic,
   loading: Loader2,
   image: Image,
-  submit: Image,
+  submit: PenTool,
   download: Download,
   chevronLeft: ChevronLeft,
   chevronRight: ChevronRight,
@@ -28,5 +30,6 @@ export const Icons = {
   trash: Trash2,
   add: Plus,
   warning: AlertTriangle,
-  media: Film
+  media: Film,
+  copy: Copy
 }
