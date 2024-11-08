@@ -4,11 +4,12 @@ const nextConfig = {
   output: 'standalone',
   distDir: '.next',
   experimental: {
-    forceSwcTransforms: true
+    forceSwcTransforms: false
   },
   eslint: {
     ignoreDuringBuilds: true
-  }
+  },
+  swcMinify: false
 }
 
 module.exports = nextConfig 

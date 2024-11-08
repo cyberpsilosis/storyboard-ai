@@ -1,7 +1,7 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "buildCommand": "cd frontend && npm install --force && npm run vercel-build",
+  "buildCommand": "cd frontend && npm install --force && NEXT_TELEMETRY_DISABLED=1 npm run vercel-build",
   "outputDirectory": "frontend/.next",
   "builds": [
     {
@@ -9,9 +9,14 @@
       "use": "@vercel/next",
       "config": {
         "skipBuildCache": true,
-        "zeroConfig": false
+        "zeroConfig": false,
+        "nodeVersion": "18.x"
       }
     }
   ],
-  "installCommand": "npm install --force"
+  "installCommand": "npm install --force",
+  "env": {
+    "NEXT_TELEMETRY_DISABLED": "1",
+    "NODE_OPTIONS": "--max_old_space_size=4096"
+  }
 } 

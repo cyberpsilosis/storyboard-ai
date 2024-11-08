@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "vercel-build": "npm install && DISABLE_ESLINT_PLUGIN=true next build",
+    "vercel-build": "npm install --force && next build",
     "start": "next start",
     "lint": "next lint --max-warnings 50"
   },
@@ -41,7 +41,9 @@
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.170.0",
-    "together-ai": "^0.8.0"
+    "together-ai": "^0.8.0",
+    "@next/swc-linux-x64-gnu": "13.4.19",
+    "@next/swc-linux-x64-musl": "13.4.19"
   },
   "peerDependencies": {
     "react": "^18.2.0",
