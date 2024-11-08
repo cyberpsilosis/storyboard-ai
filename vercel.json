@@ -10,7 +10,7 @@
       "config": {
         "skipBuildCache": true,
         "zeroConfig": false,
-        "nodeVersion": "18.x"
+        "nodeVersion": "20.x"
       }
     }
   ],
